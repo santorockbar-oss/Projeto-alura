@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards: Cachorro-Salsicha (Dachshund)</title>
+<style>
+  :root {
+    --color-1: #c9a23e;
+    --color-2: #8f7d49;
+    --color-3: #eca324;
+    --color-4: #6b5a3a;
+    --color-5: #3c352c;
+    --color-6: #2b2620;
+
+    --bg: var(--color-6);
+    --surface: var(--color-5);
+    --surface-alt: var(--color-4);
+    --accent: var(--color-3);
+    --accent-hover: #f5b543;
+    --text-main: #f6efe1;
+    --text-muted: var(--color-1);
+    --border: #4a4033;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(236, 163, 36, 0.10), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(236, 163, 36, 0.08), transparent 40%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='220' viewBox='0 0 260 220'%3E%3Cg fill='%23f6efe1' fill-opacity='0.035'%3E%3Cpath d='M55 100c-14 0-24 12-24 26 0 16 12 34 40 34h18c28 0 40-18 40-34 0-14-10-26-24-26-8 0-14 4-19 4h-12c-5 0-11-4-19-4z'/%3E%3Cellipse cx='30' cy='96' rx='7' ry='9'/%3E%3Cellipse cx='45' cy='84' rx='7' ry='9'/%3E%3Cellipse cx='95' cy='84' rx='7' ry='9'/%3E%3Cellipse cx='110' cy='96' rx='7' ry='9'/%3E%3Cpath d='M190 40c-3-8-11-13-19-13-8 0-14 5-16 12-2-9-9-15-18-15-11 0-19 9-19 20 0 15 12 24 34 40 22-16 34-25 34-40 0-1 0-3-1-4z' transform='translate(0,0) scale(0.9)'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat, repeat, repeat;
+    background-size: auto, auto, 260px 220px;
+    color: var(--text-main);
+    min-height: 100vh;
+    padding: 30px 20px;
+  }
+
+  .container {
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+  }
+
+  .logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--accent);
+  }
+
+  .counter {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: var(--text-main);
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress {
+    height: 6px;
+    background: var(--surface-alt);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .progress-bar {
+    width: 20%;
+    height: 100%;
+    background: var(--accent);
+    transition: width .3s ease;
+  }
+
+  .card-container {
+    perspective: 1000px;
+  }
+
+  .flashcard {
+    height: 460px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .5s ease;
+    cursor: pointer;
+  }
+
+  .flashcard.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .card {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .4);
+    overflow: hidden;
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+  }
+
+  .card-photo {
+    width: 100%;
+    height: 220px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: var(--surface-alt);
+    display: block;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--surface-alt);
+    color: var(--color-3);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 7px 12px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+
+  .card-number {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #paragrafo {
+    color: azure;
+    margin-top: 40px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    text-align: center;
+  }
+
+  .card-content {
+    margin: 14px 0;
+    overflow-y: auto;
+  }
+
+  .card-content h2 {
+    font-size: 22px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    color: var(--text-main);
+  }
+
+  .card-content p {
+    color: #e2d3ae;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .card-footer {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  button {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+    font-family: inherit;
+  }
+
+  .previous {
+    background: var(--surface-alt);
+    color: var(--text-main);
+  }
+
+  .next {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  button:hover {
+    opacity: .85;
+  }
+
+  .next:hover {
+    background: var(--accent-hover);
+  }
+
+  button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  .status {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .finished {
+    display: none;
+    text-align: center;
+    background: var(--surface);
+    padding: 40px 25px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .finished h2 {
+    margin-bottom: 12px;
+    color: var(--text-main);
+  }
+
+  .finished p {
+    color: var(--color-1);
+    margin-bottom: 25px;
+  }
+
+  .finished button {
+    max-width: 220px;
+    background: var(--accent);
+    color: var(--bg);
+    margin: 0 auto;
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 25px 15px;
+    }
+
+    h1 {
+      font-size: 27px;
+    }
+
+    .flashcard {
+      height: 460px;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .card-photo {
+      height: 190px;
+    }
+
+    .card-content h2 {
+      font-size: 20px;
+    }
+
+    .actions {
+      gap: 8px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🐾 Giovanna </div>
+      <div class="counter" id="counter">1 / 5</div>
+    </header>
+
+    <h1>Cachorro-Salsicha</h1>
+    <p class="subtitle">Curiosidades sobre o Dachshund — clique no card para virar</p>
+
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="card-container">
+      <div class="flashcard" id="flashcard">
+        <div class="card card-front">
+          <img class="card-photo" id="photoFront" src="" alt="Cachorro-salsicha">
+          <div class="card-top">
+            <span class="tag" id="tagFront">Origem</span>
+            <span class="card-number" id="numberFront">01</span>
+          </div>
+          <div class="card-content" id="frontContent"></div>
+          <div class="card-footer">Clique para ver a resposta</div>
+        </div>
+        <div class="card card-back">
+          <div class="card-top">
+            <span class="tag" id="tagBack">Origem</span>
+            <span class="card-number" id="numberBack">01</span>
+          </div>
+          <div class="card-content" id="backContent"></div>
+          <div class="card-footer">Clique para voltar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="previous" id="btnPrev">Anterior</button>
+      <button class="next" id="btnNext">Próximo</button>
+    </div>
+
+    <div class="status" id="status">Card 1 de 5</div>
+
+    <div class="finished" id="finished">
+      <h2>Você conhece bem o Salsicha! 🌭🐶</h2>
+      <p>Revisou todas as curiosidades sobre o Dachshund.</p>
+      <button id="btnRestart">Recomeçar</button>
+    </div>
+  </div>
+
+  <footer>
+    <p id="paragrafo">Desenvolvido por Giovanna</p>
+  </footer>
+
+  <script>
+    const cards = [
+      {
+        tag: "Origem",
+        photo: "https://images.unsplash.com/photo-1520038410233-7141be7e6f97?auto=format&fit=crop&w=800&q=70",
+        front: "De onde vem o Dachshund?",
+        back: "A raça surgiu na Alemanha há mais de 300 anos. O nome 'Dachshund' significa literalmente 'cão-texugo', porque o corpo alongado e as patas curtas foram feitos sob medida para entrar em tocas."
+      },
+      {
+        tag: "Corpo",
+        photo: "https://images.unsplash.com/photo-1596116082596-7a0da930b9aa?auto=format&fit=crop&w=800&q=70",
+        front: "Por que ele tem esse corpo comprido?",
+        back: "Essa característica se chama 'condrodisplasia', uma forma de nanismo nas pernas. Ela foi selecionada de propósito para o cão cavar e perseguir texugos e outros animais dentro de tocas estreitas."
+      },
+      {
+        tag: "Faro",
+        photo: "https://images.unsplash.com/photo-1615137702406-c3c790836297?auto=format&fit=crop&w=800&q=70",
+        front: "O Salsicha tem bom faro?",
+        back: "Sim! Depois do Beagle e do Basset Hound, o Dachshund está entre as raças com melhor olfato do mundo, o que explica seu instinto forte para farejar e cavar."
+      },
+      {
+        tag: "Personalidade",
+        photo: "https://images.unsplash.com/photo-1748667955744-65dcdb539066?auto=format&fit=crop&w=800&q=70",
+        front: "Como é o temperamento da raça?",
+        back: "É um cão corajoso, teimoso e cheio de personalidade — muito mais 'grande' no comportamento do que no tamanho. Também costuma ser leal e apegado à família."
+      },
+      {
+        tag: "Saúde",
+        photo: "https://images.unsplash.com/photo-1556796879-160fd67614ae?auto=format&fit=crop&w=800&q=70",
+        front: "Qual cuidado especial ele exige?",
+        back: "Por causa da coluna alongada, é propenso a problemas de disco (IVDD). Por isso, é importante evitar que ele suba e desça escadas ou pule de móveis com frequência."
+      }
+    ];
+
+    let current = 0;
+    let flipped = false;
+
+    const flashcard = document.getElementById('flashcard');
+    const photoFront = document.getElementById('photoFront');
+    const frontContent = document.getElementById('frontContent');
+    const backContent = document.getElementById('backContent');
+    const tagFront = document.getElementById('tagFront');
+    const tagBack = document.getElementById('tagBack');
+    const numberFront = document.getElementById('numberFront');
+    const numberBack = document.getElementById('numberBack');
+    const counter = document.getElementById('counter');
+    const status = document.getElementById('status');
+    const progressBar = document.getElementById('progressBar');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const finished = document.getElementById('finished');
+    const cardContainer = document.querySelector('.card-container');
+    const actions = document.querySelector('.actions');
+    const btnRestart = document.getElementById('btnRestart');
+
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function render() {
+      const data = cards[current];
+      const num = pad(current + 1);
+
+      tagFront.textContent = data.tag;
+      tagBack.textContent = data.tag;
+      numberFront.textContent = num;
+      numberBack.textContent = num;
+
+      photoFront.src = data.photo;
+      photoFront.alt = data.tag + " - Dachshund";
+
+      frontContent.innerHTML = `<h2>${data.front}</h2>`;
+      backContent.innerHTML = `<p>${data.back}</p>`;
+
+      counter.textContent = `${current + 1} / ${cards.length}`;
+      status.textContent = `Card ${current + 1} de ${cards.length}`;
+      progressBar.style.width = `${((current + 1) / cards.length) * 100}%`;
+
+      btnPrev.disabled = current === 0;
+      btnNext.textContent = current === cards.length - 1 ? 'Finalizar' : 'Próximo';
+
+      flipped = false;
+      flashcard.classList.remove('flipped');
+    }
+
+    flashcard.addEventListener('click', () => {
+      flipped = !flipped;
+      flashcard.classList.toggle('flipped', flipped);
+    });
+
+    btnPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (current > 0) {
+        current--;
+        render();
+      }
+    });
+
+    btnNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (current < cards.length - 1) {
+        current++;
+        render();
+      } else {
+        cardContainer.style.display = 'none';
+        actions.style.display = 'none';
+        status.style.display = 'none';
+        finished.style.display = 'block';
+      }
+    });
+
+    btnRestart.addEventListener('click', () => {
+      current = 0;
+      cardContainer.style.display = 'block';
+      actions.style.display = 'flex';
+      status.style.display = 'block';
+      finished.style.display = 'none';
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
